@@ -27,8 +27,7 @@ add_library(
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/SDL_android_main.c
-             src/main.cpp )
+             src/snake.c
 
 
 find_library( # Sets the name of the path variable.
