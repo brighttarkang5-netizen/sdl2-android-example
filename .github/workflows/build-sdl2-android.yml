@@ -27,14 +27,10 @@ jobs:
           distribution: adopt-hotspot
           java-version: 15
       
-      - name: Building with Gradle
-        uses: eskatos/gradle-command-action@v1.3.3
-        with:
-          gradle-version: 6.9
-          wrapper-cache-enabled: true
-          dependencies-cache-enabled: true
-          configuration-cache-enabled: true
-          arguments: 'build -x lint'
+      - name: Build APK with Gradle (no cache)
+  run: |
+    chmod +x gradlew
+    ./gradlew assembleDebug --no-daemon --no-build-cache
       
       - name: Upload APK Files to Release
         uses: softprops/action-gh-release@v1
