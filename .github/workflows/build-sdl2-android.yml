@@ -1,53 +1,64 @@
-name:  build-and-release
+name: build-and-release
+
 on:
-push:
-branches: [ "master" ]
-workflow_dispatch:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
 
 jobs:
-build-creator:
-name: Build & Release APK
-runs-on: ubuntu-latest
-steps:
-- name: Checkout repository
-uses: actions/checkout@v2.3.4
+  build-creator:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
 
-- name: Get current time  
-    uses: srfrnk/current-time@master  
-    id: current-time  
-    with:  
-      format: DD-MM-YYYY  
-    
-  - name: Updating Build Tools  
-    run: sudo apt update && sudo apt upgrade  
-    
-  - name: Setup Java Envirionment  
-    uses: actions/setup-java@v2.1.0  
-    with:  
-      distribution: adopt-hotspot  
-      java-version: 15  
-    
-  - name: Build APK with Gradle (no cache)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-run: |
-chmod +x gradlew
-./gradlew assembleDebug --no-daemon --no-build-cache
+      - name: Get current time
+        uses: srfrnk/current-time@master
+        id: current-time
+        with:
+          format: DD-MM-YYYY
 
-- name: Upload APK Files to Release  
-    uses: softprops/action-gh-release@v1  
-    with:  
-      name: "Auto Build ${{ steps.current-time.outputs.formattedTime }}"
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: adopt-hotspot
+          java-version: '15'
 
-tag_name: v1.0.2
+      - name: Install Android SDK command-line tools and packages
+        env:
+          ANDROID_SDK_ROOT: ${{ runner.home }}/android-sdk
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          # download commandline tools (version can be updated)
+          curl -sSfL https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o /tmp/cmdline.zip
+          unzip -q /tmp/cmdline.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          # move into expected layout
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest || true
+          export PATH="$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools"
+          # Accept licenses and install required packages (adjust platform/build-tools versions if needed)
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
-prerelease: true  
-      body: |  
-        This is an Automatic Release by GitHub Actions.  
-        APK marked "unsigned" needs to be signed with test key before installing.  
-        This may change in Future.  
-      files: |  
-        ./app/build/outputs/apk/*/*/*.apk  
-    env:  
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build APK with Gradle (no cache)
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --no-build-cache
 
-Thats my workflow
+      - name: Upload APK Files to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Auto Build ${{ steps.current-time.outputs.formattedTime }}"
+          tag_name: v1.0.2
+          prerelease: true
+          body: |
+            This is an Automatic Release by GitHub Actions.
+            APK marked "unsigned" needs to be signed with test key before installing.
+            This may change in Future.
+          files: |
+            ./app/build/outputs/apk/*/*/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
