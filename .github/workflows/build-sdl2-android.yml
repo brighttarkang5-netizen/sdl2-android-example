@@ -1,37 +1,53 @@
-name: build-and-release
+name:  build-and-release
 on:
-  push:
-    branches: [ "master" ]
-  workflow_dispatch:
+push:
+branches: [ "master" ]
+workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Project
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+build-creator:
+name: Build & Release APK
+runs-on: ubuntu-latest
+steps:
+- name: Checkout repository
+uses: actions/checkout@v2.3.4
 
-      - name: Get current time
-        uses: srfrnk/current-time@master
-        id: current-time
-        with:
-          format: DD-MM-YYYY
+- name: Get current time  
+    uses: srfrnk/current-time@master  
+    id: current-time  
+    with:  
+      format: DD-MM-YYYY  
+    
+  - name: Updating Build Tools  
+    run: sudo apt update && sudo apt upgrade  
+    
+  - name: Setup Java Envirionment  
+    uses: actions/setup-java@v2.1.0  
+    with:  
+      distribution: adopt-hotspot  
+      java-version: 15  
+    
+  - name: Build APK with Gradle (no cache)
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+run: |
+chmod +x gradlew
+./gradlew assembleDebug --no-daemon --no-build-cache
 
-      - name: Build with Gradle (no cache)
-        run: |
-          chmod +x gradlew
-          ./gradlew build --no-daemon --no-build-cache
+- name: Upload APK Files to Release  
+    uses: softprops/action-gh-release@v1  
+    with:  
+      name: "Auto Build ${{ steps.current-time.outputs.formattedTime }}"
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: "build-${{ steps.current-time.outputs.formattedTime }}"
-          path: |
-            build/libs/**/*.jar
+tag_name: v1.0.2
+
+prerelease: true  
+      body: |  
+        This is an Automatic Release by GitHub Actions.  
+        APK marked "unsigned" needs to be signed with test key before installing.  
+        This may change in Future.  
+      files: |  
+        ./app/build/outputs/apk/*/*/*.apk  
+    env:  
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+Thats my workflow
