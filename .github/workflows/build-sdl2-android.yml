@@ -12,7 +12,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4 # Updated from v2
+        
+     - name: Setup NDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "ndk;21.4.7075529"
 
+      - name: Building with Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 6.9
+          # This 'arguments' line is key—it points Gradle to the NDK we just set up
+          arguments: 'build -x lint -Pandroid.ndkPath=/usr/local/lib/android/sdk/ndk/21.4.7075529'
+          
       - name: Get current time
         uses: srfrnk/current-time@master
         id: current-time
