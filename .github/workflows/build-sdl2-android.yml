@@ -28,6 +28,8 @@ jobs:
 
       - name: Setup NDK
         uses: android-actions/setup-android@v3
+         env:
+          SKIP_JDK_VERSION_CHECK: 'true' # This bypasses that annoying check
         with:
           packages: "ndk;21.4.7075529"
 
