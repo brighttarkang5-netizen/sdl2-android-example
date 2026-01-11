@@ -20,20 +20,25 @@ jobs:
         with:
           format: DD-MM-YYYY
 
-      - name: Setup Java 11
+      # -------------------------------
+      # Java 17 (ONLY for Android SDK)
+      # -------------------------------
+      - name: Setup Java 17 (Android SDK tools)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
-          cache: gradle
+          java-version: '17'
 
-      - name: Setup Android SDK (Java 11 compatible)
+      # -------------------------------
+      # Install Android SDK + NDK
+      # -------------------------------
+      - name: Setup Android SDK & NDK
         run: |
           sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
           cd /usr/local/lib/android/sdk/cmdline-tools
 
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-          unzip -q commandlinetools-linux-8512546_latest.zip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-12266719_latest.zip
+          unzip -q commandlinetools-linux-12266719_latest.zip
           mv cmdline-tools latest
 
           yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
@@ -43,6 +48,20 @@ jobs:
             "build-tools;30.0.3" \
             "ndk;21.4.7075529"
 
+      # -------------------------------
+      # Switch BACK to Java 11
+      # (Gradle 6.9 compatibility)
+      # -------------------------------
+      - name: Setup Java 11 (Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: gradle
+
+      # -------------------------------
+      # Build APK
+      # -------------------------------
       - name: Grant execute permission
         run: chmod +x gradlew
 
@@ -52,6 +71,9 @@ jobs:
             -x lint \
             -Pandroid.ndkPath=$ANDROID_SDK_ROOT/ndk/21.4.7075529
 
+      # -------------------------------
+      # Create GitHub Release
+      # -------------------------------
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
