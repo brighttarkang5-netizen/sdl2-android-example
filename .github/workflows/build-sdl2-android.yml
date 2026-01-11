@@ -35,13 +35,13 @@ jobs:
           packages: "ndk;21.4.7075529"
 
       - name: Grant execute permission
-  run: chmod +x gradlew
+        run: chmod +x gradlew
 
-- name: Build APK
-  run: |
-    ./gradlew assembleRelease \
-    -x lint \
-    -Pandroid.ndkPath=$ANDROID_SDK_ROOT/ndk/21.4.7075529
+      - name: Build APK
+        run: |
+         ./gradlew assembleRelease \
+         -x lint \
+         -Pandroid.ndkPath=$ANDROID_SDK_ROOT/ndk/21.4.7075529
  
       - name: Create Release
         uses: softprops/action-gh-release@v2
