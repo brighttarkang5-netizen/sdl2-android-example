@@ -1,4 +1,4 @@
-name: build-and-release-
+name: build-and-release
 
 on:
   push:
@@ -34,13 +34,15 @@ jobs:
         with:
           packages: "ndk;21.4.7075529"
 
-      - name: Building with Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 6.9
-          # We force Gradle to use the specific NDK version we downloaded
-          arguments: 'build -x lint -Pandroid.ndkPath=/usr/local/lib/android/sdk/ndk/21.4.7075529'
+      - name: Grant execute permission
+  run: chmod +x gradlew
 
+- name: Build APK
+  run: |
+    ./gradlew assembleRelease \
+    -x lint \
+    -Pandroid.ndkPath=$ANDROID_SDK_ROOT/ndk/21.4.7075529
+ 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
