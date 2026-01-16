@@ -20,18 +20,18 @@ jobs:
         with:
           format: DD-MM-YYYY
 
-      # -------------------------------
-      # Java 17 (ONLY for Android SDK)
-      # -------------------------------
+      # ------------------------------------
+      # Java 17 (ONLY for Android SDK tools)
+      # ------------------------------------
       - name: Setup Java 17 (Android SDK tools)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # -------------------------------
-      # Install Android SDK + NDK
-      # -------------------------------
+      # ------------------------------------
+      # Install Android SDK + NDK 21
+      # ------------------------------------
       - name: Setup Android SDK & NDK
         run: |
           sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
@@ -48,10 +48,9 @@ jobs:
             "build-tools;30.0.3" \
             "ndk;21.4.7075529"
 
-      # -------------------------------
-      # Switch BACK to Java 11
-      # (Gradle 6.9 compatibility)
-      # -------------------------------
+      # ------------------------------------
+      # Switch BACK to Java 11 (Gradle 6.x)
+      # ------------------------------------
       - name: Setup Java 11 (Gradle)
         uses: actions/setup-java@v4
         with:
@@ -59,21 +58,34 @@ jobs:
           java-version: '11'
           cache: gradle
 
-      # -------------------------------
+      # ------------------------------------
+      # Kill conflicting NDK env vars
+      # ------------------------------------
+      - name: Clear conflicting NDK env vars
+        run: |
+          unset ANDROID_NDK_HOME
+          unset ANDROID_NDK_ROOT
+
+      # ------------------------------------
+      # Force correct NDK path (CRITICAL)
+      # ------------------------------------
+      - name: Force correct NDK path
+        run: |
+          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/21.4.7075529" > local.properties
+
+      # ------------------------------------
       # Build APK
-      # -------------------------------
+      # ------------------------------------
       - name: Grant execute permission
         run: chmod +x gradlew
 
       - name: Build APK
         run: |
-          ./gradlew assembleRelease \
-            -x lint \
-            -Pandroid.ndkPath=$ANDROID_SDK_ROOT/ndk/21.4.7075529
+          ./gradlew clean assembleRelease -x lint
 
-      # -------------------------------
+      # ------------------------------------
       # Create GitHub Release
-      # -------------------------------
+      # ------------------------------------
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
