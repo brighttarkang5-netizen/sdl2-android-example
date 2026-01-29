@@ -10,48 +10,18 @@ jobs:
     name: Build & Release APK
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_HOME: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get current time
-        uses: srfrnk/current-time@master
-        id: current-time
-        with:
-          format: DD-MM-YYYY
-
       # ------------------------------------
-      # Java 17 (ONLY for Android SDK tools)
+      # Java 11 (BEST for old Gradle + NDK)
       # ------------------------------------
-      - name: Setup Java 17 (Android SDK tools)
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      # ------------------------------------
-      # Install Android SDK + NDK 21
-      # ------------------------------------
-      - name: Setup Android SDK & NDK
-        run: |
-          sudo mkdir -p /usr/local/lib/android/sdk/cmdline-tools
-          cd /usr/local/lib/android/sdk/cmdline-tools
-
-          wget https://dl.google.com/android/repository/commandlinetools-linux-12266719_latest.zip
-          unzip -q commandlinetools-linux-12266719_latest.zip
-          mv cmdline-tools latest
-
-          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager \
-            "platform-tools" \
-            "platforms;android-30" \
-            "build-tools;30.0.3" \
-            "ndk;21.4.7075529"
-
-      # ------------------------------------
-      # Switch BACK to Java 11 (Gradle 6.x)
-      # ------------------------------------
-      - name: Setup Java 11 (Gradle)
+      - name: Setup Java 11
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -59,19 +29,39 @@ jobs:
           cache: gradle
 
       # ------------------------------------
-      # Kill conflicting NDK env vars
+      # Install Android SDK Command Line Tools
       # ------------------------------------
-      - name: Clear conflicting NDK env vars
+      - name: Install Android SDK tools
         run: |
-          unset ANDROID_NDK_HOME
-          unset ANDROID_NDK_ROOT
+          sudo mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          unzip -q commandlinetools-linux-8512546_latest.zip
+          mv cmdline-tools latest
+
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
       # ------------------------------------
-      # Force correct NDK path (CRITICAL)
+      # Install EXACT versions (CRITICAL)
       # ------------------------------------
-      - name: Force correct NDK path
+      - name: Install SDK, NDK 21, CMake 3.10.2
         run: |
-          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/21.4.7075529" > local.properties
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-30" \
+            "build-tools;30.0.3" \
+            "ndk;21.4.7075529" \
+            "cmake;3.10.2.4988404"
+
+      # ------------------------------------
+      # FORCE Gradle to use correct paths
+      # ------------------------------------
+      - name: Configure local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/21.4.7075529" >> local.properties
+          echo "cmake.dir=$ANDROID_SDK_ROOT/cmake/3.10.2.4988404" >> local.properties
 
       # ------------------------------------
       # Build APK
@@ -79,21 +69,19 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build APK
-        run: |
-          ./gradlew clean assembleRelease -x lint
+      - name: Build Release APK
+        run: ./gradlew clean assembleRelease -x lint
 
       # ------------------------------------
-      # Create GitHub Release
+      # Upload APK to GitHub Release
       # ------------------------------------
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Auto Build ${{ steps.current-time.outputs.formattedTime }}"
-          tag_name: "v${{ github.run_number }}-${{ steps.current-time.outputs.formattedTime }}"
+          tag_name: "build-${{ github.run_number }}"
+          name: "Auto APK Build #${{ github.run_number }}"
           prerelease: true
-          body: "Automatic build generated on ${{ steps.current-time.outputs.formattedTime }}."
           files: |
-            ./app/build/outputs/apk/**/*.apk
+            app/build/outputs/apk/**/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
