@@ -25,7 +25,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../SDL2_ttf/ ${CMAKE_CURRENT_SOURCE
 add_library(
     main-lib
     SHARED
-    src/snake.c
+    src/snake.cpp
 )
 
 find_library(
