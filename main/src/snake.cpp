@@ -1,11 +1,11 @@
-#include<SDL2/SDL.h>
+#include "SDL.h"
 //w=1440 h=2614
 #include<stdlib.h>
 #include<time.h>
-#include<SDL2/SDL_image.h>
+#include "SDL_image.h"
 #include<vector>
-#include<SDL2/SDL_mixer.h>
-#include<SDL2/SDL_ttf.h>
+#include "SDL_mixer.h"
+#include "SDL_ttf.h"
 SDL_Window* window;
 SDL_Renderer* render;
 int branch=1;
