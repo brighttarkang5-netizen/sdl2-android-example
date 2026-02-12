@@ -84,7 +84,11 @@ jobs:
       - name: Build APK
         run: |
           ./gradlew clean assembleRelease -x lint
-
+          
+      - name: Build Debug APK (installs on phone)
+        run: |
+          ./gradlew assembleDebug -x lint
+    
       # ------------------------------------
       # Create GitHub Release
       # ------------------------------------
