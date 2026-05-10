@@ -56,13 +56,13 @@ int touch_escape=0;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
 	Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2028);
-	window=SDL_CreateWindow("snake",100,100,100,100,0);
+	window=SDL_CreateWindow("snake",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,0,0,  SDL_WINDOW_FULLSCREEN);
 	//load x button for catalog
 		render=SDL_CreateRenderer(window,-1,0);
 		TTF_Init();
 		int w,h;
 		int selected_snake=1;
-SDL_GL_GetDrawableSize(window,&w,&h);
+SDL_GetWindowSize(window,&w,&h);
 int size=w/14;
 	TTF_Font* font = TTF_OpenFont("Jersey25-Regular.ttf", 100);
 	SDL_Color color={0,0,0};
