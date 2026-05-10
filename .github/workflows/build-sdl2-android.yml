@@ -7,13 +7,19 @@ on:
 
 jobs:
   build-creator:
-    name: Build & Release APK
+    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
+      # ------------------------------------
+      # Checkout repository
+      # ------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ------------------------------------
+      # Get current time
+      # ------------------------------------
       - name: Get current time
         uses: srfrnk/current-time@master
         id: current-time
@@ -21,16 +27,16 @@ jobs:
           format: DD-MM-YYYY
 
       # ------------------------------------
-      # Java 17 (ONLY for Android SDK tools)
+      # Java 17 (ONLY for SDK tools)
       # ------------------------------------
-      - name: Setup Java 17 (Android SDK tools)
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
       # ------------------------------------
-      # Install Android SDK + NDK 21
+      # Install Android SDK + NDK + CMake
       # ------------------------------------
       - name: Setup Android SDK & NDK
         run: |
@@ -47,12 +53,12 @@ jobs:
             "platforms;android-30" \
             "build-tools;30.0.3" \
             "ndk;21.4.7075529" \
-            "cmake;3.10.2.4988404"   # <-- ADD THIS LINE ONLY
+            "cmake;3.10.2.4988404"
 
       # ------------------------------------
-      # Switch BACK to Java 11 (Gradle 6.x)
+      # Java 11 for Gradle 6.x
       # ------------------------------------
-      - name: Setup Java 11 (Gradle)
+      - name: Setup Java 11
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -60,46 +66,26 @@ jobs:
           cache: gradle
 
       # ------------------------------------
-      # Kill conflicting NDK env vars
+      # Clean old builds
       # ------------------------------------
-      - name: Clear conflicting NDK env vars
+      - name: Clean old builds
         run: |
-          unset ANDROID_NDK_HOME
-          unset ANDROID_NDK_ROOT
+          rm -rf app/build
+          rm -rf .gradle
 
       # ------------------------------------
-      # Force correct NDK + CMake paths
+      # Build Debug APK
       # ------------------------------------
-      - name: Force correct NDK & CMake paths
+      - name: Build Debug APK
         run: |
-          echo "ndk.dir=$ANDROID_SDK_ROOT/ndk/21.4.7075529" > local.properties
-          echo "cmake.dir=$ANDROID_SDK_ROOT/cmake/3.10.2.4988404" >> local.properties
+          chmod +x gradlew
+          ./gradlew clean assembleDebug -x lint
 
       # ------------------------------------
-      # Build APK
+      # Upload APK
       # ------------------------------------
-      - name: Grant execute permission
-        run: chmod +x gradlew
-
-      - name: Build APK
-        run: |
-          ./gradlew clean assembleRelease -x lint
-          
-      - name: Build Debug APK (installs on phone)
-        run: |
-          ./gradlew assembleDebug -x lint
-    
-      # ------------------------------------
-      # Create GitHub Release
-      # ------------------------------------
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: "Auto Build ${{ steps.current-time.outputs.formattedTime }}"
-          tag_name: "v${{ github.run_number }}-${{ steps.current-time.outputs.formattedTime }}"
-          prerelease: true
-          body: "Automatic build generated on ${{ steps.current-time.outputs.formattedTime }}."
-          files: |
-            ./app/build/outputs/apk/**/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: debug-apk
+          path: app/build/outputs/apk/debug/*.apk
