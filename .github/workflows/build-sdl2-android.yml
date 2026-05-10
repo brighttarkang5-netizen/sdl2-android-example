@@ -102,6 +102,6 @@ jobs:
           prerelease: true
           body: "Automatic build generated on ${{ steps.current-time.outputs.formattedTime }}."
           files: |
-            ./app/build/outputs/apk/debug/*.apk
+            ./app/build/outputs/apk/**/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
