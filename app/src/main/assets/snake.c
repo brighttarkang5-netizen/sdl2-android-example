@@ -13,7 +13,7 @@ int leaf_size;
 int ref;
 int HighScore;
 int sizze;
-int main(int argc, char *argv[])
+int SDL_main(int argc, char *argv[])
 {
 	srand (time(0));
 	int back=0;
