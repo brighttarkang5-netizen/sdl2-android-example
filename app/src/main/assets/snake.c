@@ -1,11 +1,12 @@
-#include<SDL2/SDL.h>
+#include "SDL.h"
 //w=1440 h=2614
 #include<stdlib.h>
 #include<time.h>
-#include<SDL2/SDL_image.h>
+#include "SDL_image.h"
 #include<vector>
-#include<SDL2/SDL_mixer.h>
-#include<SDL2/SDL_ttf.h>
+#include "SDL_mixer.h"
+#include "SDL_ttf.h"
+#include "SDL_main.h"
 int SDL_main(int argc, char *argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
