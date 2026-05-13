@@ -23,7 +23,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../SDL2_mixer/ ${CMAKE_CURRENT_SOUR
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../SDL2_ttf/ ${CMAKE_CURRENT_SOURCE_DIR}/../SDL2_ttf)
 
 add_library(
-    main-lib
+    main
     SHARED
     src/snake.cpp
 )
@@ -34,7 +34,7 @@ find_library(
 )
 
 target_link_libraries(
-    main-lib
+    main
     SDL2
     SDL2_image
     SDL2_gfx
