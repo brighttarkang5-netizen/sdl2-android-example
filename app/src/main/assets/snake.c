@@ -1,4 +1,55 @@
 #include "SDL.h"
+#include "SDL_main.h"
+
+int SDL_main(int argc, char *argv[])
+{
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        SDL_Log("SDL Init Error: %s", SDL_GetError());
+        SDL_Delay(5000);
+        return 1;
+    }
+
+    SDL_Window* window = SDL_CreateWindow(
+        "Hello",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        640,
+        480,
+        0
+    );
+
+    if (!window) {
+        SDL_Log("Window Error: %s", SDL_GetError());
+        SDL_Delay(5000);
+        return 1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(
+        window,
+        -1,
+        SDL_RENDERER_ACCELERATED
+    );
+
+    if (!renderer) {
+        SDL_Log("Renderer Error: %s", SDL_GetError());
+        SDL_Delay(5000);
+        return 1;
+    }
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay(5000);
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
+    SDL_Quit();
+
+    return 0;
+}
+/*#include "SDL.h"
 //w=1440 h=2614
 #include<stdlib.h>
 #include<time.h>
@@ -34,7 +85,7 @@ int SDL_main(int argc, char *argv[])
     SDL_Quit();
 
     return 0;
-}
+}*/
 /*
 SDL_Window* window;
 SDL_Renderer* render;
