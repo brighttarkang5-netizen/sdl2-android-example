@@ -1,71 +1,5 @@
+
 #include "SDL.h"
-#include "SDL_main.h"
-int SDL_main(int argc, char *argv[])
-{
-    // 1. Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        SDL_Log("SDL Init Error: %s", SDL_GetError());
-        return 1;
-    }
-
-    // 2. Create Window (Adapted for Android screens)
-    SDL_Window* window = SDL_CreateWindow(
-        "Hello",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        0, 0, // Let Android determine the resolution
-        SDL_WINDOW_FULLSCREEN_DESKTOP
-    );
-
-    if (!window) {
-        SDL_Log("Window Error: %s", SDL_GetError());
-        return 1;
-    }
-
-    // 3. Create Renderer
-    SDL_Renderer* renderer = SDL_CreateRenderer(
-        window,
-        -1,
-        SDL_RENDERER_ACCELERATED
-    );
-
-    if (!renderer) {
-        SDL_Log("Renderer Error: %s", SDL_GetError());
-        return 1;
-    }
-
-    // 4. The Game Loop (Crucial for Android)
-    bool isRunning = true;
-    SDL_Event event;
-
-    while (isRunning) {
-        // Pump events so Android knows the app hasn't frozen
-        while (SDL_PollEvent(&event)) {
-            // If the user closes the app or presses the Android back button
-            if (event.type == SDL_QUIT) {
-                isRunning = false;
-            }
-        }
-
-        // Draw the red screen
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
-
-        // Give the CPU a tiny 16ms break (~60 frames per second) 
-        // instead of a massive 500,000ms coma
-        SDL_Delay(16); 
-    }
-
-    // 5. Cleanup
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    return 0;
-}
-
-/*#include "SDL.h"
 //w=1440 h=2614
 #include<stdlib.h>
 #include<time.h>
@@ -820,4 +754,4 @@ if(tail[back]==u&&tail[back+1]==v){
 }//branch 2;
 }//main looop
 }
-*/
+
