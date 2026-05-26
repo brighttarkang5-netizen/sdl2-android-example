@@ -26,6 +26,7 @@ add_library(
     main
     SHARED
     src/snake.cpp
+    src/SDL_android_main.c
 )
 
 find_library(
