@@ -35,7 +35,6 @@ find_library(
 
 target_link_libraries(
     main
-    SDL2main
     SDL2
     SDL2_image
     SDL2_gfx
