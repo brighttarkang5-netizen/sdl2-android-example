@@ -37,8 +37,8 @@ int box_in_width=0;
 	char text[44];
 	sprintf(text,"%d",score);
 int increase=1, decrease=0;
-	std::vector<int>tail;
-tail.push_back(0);
+	std::vector<int>tail(2,0);
+//tail.push_back(0);
 	int count=0;
 	//screen size
 int ran=1;
