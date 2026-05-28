@@ -711,7 +711,7 @@ point+=7;
 		
 			num=index;
 			if(fall){
-					for(int i=back;i>=0;i-=2){
+					for(int i=back;i>=2;i-=2){
 	
 		
 			tail[i]=tail[i-2];
@@ -725,7 +725,7 @@ if(tail[back]==u&&tail[back+1]==v){
 }
 					}
 	}else{
-			for(int i=back;i>=0;i-=2){
+			for(int i=back;i>=2;i-=2){
 	
 			tail[i]=tail[i-2];
 			tail[i+1]=tail[i-1];
