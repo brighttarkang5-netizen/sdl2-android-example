@@ -52,7 +52,7 @@ int point=15;
 int on_pause=0;
 int speed_limit=100;
 int fall=0;
-char temp[55];
+char temp[55]=" ";
 int touch_escape=0;
 	Uint32 last,now;
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -135,7 +135,7 @@ SDL_Texture* restart=IMG_LoadTexture(render,"restart.png");
 ref=w/size;
 sizze=size;
 int index=0;
-SDL_Rect big[w*5];
+SDL_Rect big[w];
 struct hole{
 	int x=sizze*(rand()%10+2);
 	int y=sizze*(rand()%19+5);
@@ -267,7 +267,7 @@ else{//BRANCH 2
 SDL_SetRenderDrawBlendMode(render,SDL_BLENDMODE_BLEND);
 	while (1){
 		FILE* file=fopen("recents.txt","r");
-		char temp[55];
+		char temp[55]=" ";
 		while(fgets(temp,sizeof(temp),file)){
 		}
 		HighScore=atoi(temp);
