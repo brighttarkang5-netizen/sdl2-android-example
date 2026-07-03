@@ -55,6 +55,17 @@ int fall=0;
 char temp[55]=" ";
 int touch_escape=0;
 	Uint32 last,now;
+
+	// --- ADD THIS FOR ANDROID STORAGE ---
+const char* internal_path = SDL_AndroidGetInternalStoragePath();
+char save_path[512];
+if (internal_path != NULL) {
+    snprintf(save_path, sizeof(save_path), "%s/recents.txt", internal_path);
+} else {
+    snprintf(save_path, sizeof(save_path), "recents.txt"); // Fallback for PC/Cxxdroid
+}
+// -------------------------------------
+	
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
 	Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2028);
@@ -266,15 +277,20 @@ SDL_Delay(100);
 else{//BRANCH 2
 SDL_SetRenderDrawBlendMode(render,SDL_BLENDMODE_BLEND);
 	while (1){
-		FILE* file=fopen("recents.txt","r");
-		char temp[55]=" ";
-		while(fgets(temp,sizeof(temp),file)){
+		// --- CHANGED FOR SAFETY & ANDROID PATH ---
+		char temp[55] = "0"; // Default score to "0" if file doesn't exist yet
+		FILE* file = fopen(save_path, "r"); 
+		if (file != NULL) {
+			while(fgets(temp, sizeof(temp), file)){
+			}
+			fclose(file);
 		}
-		HighScore=atoi(temp);
-		sprintf(temp,"HighScore: %d %d %d", HighScore,snake.x,snake.y);
+		HighScore = atoi(temp);
+		sprintf(temp, "HighScore: %d %d %d", HighScore, snake.x, snake.y);
+		// -----------------------------------------
+		
 		box_in_height=0;
 		box_in_width=0;
-		fclose(file);
 high=TTF_RenderText_Solid(font,temp,high_color);
 		high_texture=SDL_CreateTextureFromSurface(render,high);
 			SDL_Rect high_rect{int(0.36*w),int(0.03*h),int(0.48*w),int(0.07*w)};
@@ -696,12 +712,17 @@ point+=7;
 	tail.resize(back+2);
 	score++;
 	if(score>HighScore){
-		file=fopen("recents.txt","w");
-		HighScore=score;
-		fprintf (file,"%d",score);
-		fclose (file);
+		// --- CHANGED FOR SAFETY & ANDROID PATH ---
+		FILE* file_w = fopen(save_path, "w");
+		HighScore = score;
+		if (file_w != NULL) {
+			fprintf(file_w, "%d", score);
+			fclose(file_w);
+		}
+		// -----------------------------------------
 	}
 	skip=1;
+		
 	Mix_PlayChannel(-1,bite,0);
 	sprintf(text,"%d",score);
 	surface2=TTF_RenderText_Solid(font,text,color2);
