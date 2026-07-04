@@ -124,7 +124,7 @@ SDL_Rect menu{int(0.2*w),int(0.3*h),int(0.6*w),int(0.4*h)};
 	SDL_Texture* pause=IMG_LoadTexture(render,"pause_button.png");
 	//Music
 // Load background music through Android asset manager
-SDL_RWops* rw_bg = SDL_RWFromFile("background_music.mp3", "rb");
+SDL_RWops* rw_bg = SDL_RWFromFile("background_music.wav", "rb");
 Mix_Music* background_music = NULL;
 if (rw_bg != NULL) {
     background_music = Mix_LoadMUS_RW(rw_bg, 1); // 1 means it frees the RWops automatically
@@ -151,7 +151,7 @@ SDL_Texture* dead_head[3];
 dead_head[1]=IMG_LoadTexture(render,"snake_green_xx.png");
 dead_head[2]=IMG_LoadTexture(render,"snake_yellow_xx.png");
 // Load bite sound through Android asset manager
-SDL_RWops* rw_bite = SDL_RWFromFile("bite.mp3", "rb");
+SDL_RWops* rw_bite = SDL_RWFromFile("bite.wav", "rb");
 Mix_Chunk* bite = NULL;
 if (rw_bite != NULL) {
     // Note: Mix_LoadWAV_RW requires '0' for the second parameter if you want to free it safely manually,
