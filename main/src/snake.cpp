@@ -125,9 +125,9 @@ SDL_Rect menu{int(0.2*w),int(0.3*h),int(0.6*w),int(0.4*h)};
 	//Music
 // Load background music through Android asset manager
 SDL_RWops* rw_bg = SDL_RWFromFile("background_music.wav", "rb");
-Mix_Music* background_music = NULL;
+Mix_Chunk* background_music = NULL;
 if (rw_bg != NULL) {
-    background_music = Mix_LoadMUS_RW(rw_bg, 1); // 1 means it frees the RWops automatically
+    background_music = Mix_LoadWAV_RW(rw_bg, 1); // 1 means it frees the RWops automatically
 }
 if (background_music == NULL) {
     SDL_Log("Failed to load music: %s", Mix_GetError());
@@ -206,7 +206,7 @@ tlp_rect[2]={int(0.5*w),int(0.93*h), size,size};
 tlp_rect[3]={int (0.07*w),int(0.5*h),size, size};
 SDL_Texture* tlp=IMG_LoadTexture(render
 ,"teleport.png");
-Mix_PlayMusic(background_music,-1);
+Mix_PlayChannel(0, background_music, -1);
 SDL_SetRenderDrawBlendMode(render,SDL_BLENDMODE_BLEND);
 SDL_Surface* music_surface=TTF_RenderText_Solid(font,"Music :",color);
 SDL_Texture* music_texture=SDL_CreateTextureFromSurface(render, music_surface);
@@ -635,6 +635,12 @@ point+=7;
 			}
 			if(branch!=3){
  while (SDL_PollEvent(&e)){
+	 	if (e.type == SDL_KEYDOWN) {
+        if (e.key.keysym.sym == SDLK_AC_BACK) {
+            // The user pressed the Android back button!
+            branch=3; 
+        }
+		}
  	if(e.type==SDL_FINGERDOWN){
  		drag=1;
  		startx=e.tfinger.x*w;
