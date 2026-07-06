@@ -306,7 +306,7 @@ SDL_SetRenderDrawBlendMode(render,SDL_BLENDMODE_BLEND);
 			fclose(file);
 		}
 		HighScore = atoi(temp);
-		sprintf(temp, "HighScore: %d %d %d", HighScore, snake.x, snake.y);
+		sprintf(temp, "HighScore: %d", HighScore);
 		// -----------------------------------------
 		
 		box_in_height=0;
